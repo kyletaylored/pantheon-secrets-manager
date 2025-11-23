@@ -1,5 +1,13 @@
 # EditorConfig for WordPress Coding Standards
 # https://editorconfig.org
+#
+# IMPORTANT: This project uses WordPress Coding Standards, NOT PSR-2/PSR-12
+# - Braces on SAME line as function/class declaration
+# - Spaces around parentheses in control structures
+# - Tabs for indentation in PHP files
+#
+# DO NOT enable "format on save" for PHP files in your editor
+# Use `composer fix` to format PHP files instead
 
 root = true
 
@@ -12,6 +20,8 @@ trim_trailing_whitespace = true
 [*.php]
 indent_style = tab
 indent_size = 4
+# Disable auto-formatting - use phpcs/phpcbf instead
+max_line_length = 120
 
 [*.{json,yml,yaml}]
 indent_style = space

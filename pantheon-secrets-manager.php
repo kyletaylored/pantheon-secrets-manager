@@ -52,7 +52,7 @@ function bootstrap() {
 	}
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
-		WP_CLI::add_command( 'pantheon-secrets', '\PantheonSecretsManager\CLI\SecretsCommand' );
+		\WP_CLI::add_command( 'pantheon-secrets', '\PantheonSecretsManager\CLI\SecretsCommand' );
 	}
 }
 
@@ -60,6 +60,11 @@ function bootstrap() {
  * Activation hook.
  */
 function activate() {
+	// Create database table.
+	$repository = new \PantheonSecretsManager\Service\SecretsRepository();
+	$repository->create_table();
+
+	// Grant capability to administrator.
 	$role = get_role( 'administrator' );
 	if ( $role ) {
 		$role->add_cap( 'manage_pantheon_secrets' );

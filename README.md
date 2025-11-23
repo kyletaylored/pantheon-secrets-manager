@@ -64,6 +64,21 @@ This project includes an `.editorconfig` file to ensure consistent formatting ac
 
 Most modern editors (VSCode, PHPStorm, Sublime Text, etc.) support EditorConfig automatically. If your editor doesn't, install the EditorConfig plugin.
 
+**IMPORTANT:** Disable "format on save" for PHP files in your editor to prevent conflicts with WordPress Coding Standards:
+
+**VSCode:** Add to your user or workspace `settings.json`:
+```json
+{
+  "[php]": {
+    "editor.formatOnSave": false
+  }
+}
+```
+
+**PHPStorm:** Go to Settings → Editor → Code Style → PHP → Set from... → Predefined Style → WordPress
+
+Use `composer fix` to format PHP files according to WordPress standards.
+
 ### Manual Commands
 
 You can also run checks manually:

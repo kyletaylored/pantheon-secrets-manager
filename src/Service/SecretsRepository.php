@@ -19,6 +19,7 @@ class SecretsRepository {
 
 
 
+
 	/**
 	 * The table name.
 	 *
