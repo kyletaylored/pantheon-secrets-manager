@@ -42,6 +42,27 @@ Navigate to the "Pantheon Secrets" menu in the WordPress admin dashboard to mana
 1.  Clone the repository.
 2.  Run `composer install`.
 
+### Development
+
+### Pre-commit Hooks
+
+This project uses `brainmaestro/composer-git-hooks` to automatically run checks before committing.
+- **Linting:** `phpcs` checks for coding standard violations.
+- **Testing:** `phpunit` runs the test suite.
+
+If you need to bypass these checks (not recommended), you can use the `--no-verify` flag:
+```bash
+git commit -m "Your message" --no-verify
+```
+
+### Manual Commands
+
+You can also run checks manually:
+- `composer lint`: Run PHPCS.
+- `composer fix`: Run PHPCBF to fix formatting issues.
+- `composer test`: Run PHPUnit.
+```
+
 ### Testing
 
 Run PHPUnit tests:

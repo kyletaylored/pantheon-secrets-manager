@@ -18,6 +18,7 @@ class SecretsRepository {
 
 
 
+
 	/**
 	 * The table name.
 	 *
@@ -143,8 +144,8 @@ class SecretsRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT * FROM $this->table_name WHERE pantheon_secret_name = %s AND environment = %s",
 				$name,
 				$environment

@@ -15,13 +15,35 @@
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-        "wp-coding-standards/wpcs": "^3.0",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^10.0",
+        "squizlabs/php_codesniffer": "^3.7",
+        "brainmaestro/composer-git-hooks": "^3.0"
     },
     "autoload": {
         "psr-4": {
             "PantheonSecretsManager\\": "src/"
         }
+    },
+    "extra": {
+        "hooks": {
+            "pre-commit": [
+                "vendor/bin/phpcs",
+                "vendor/bin/phpunit"
+            ]
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "vendor/bin/cghooks add --ignore-lock",
+            "vendor/bin/cghooks update"
+        ],
+        "post-update-cmd": [
+            "vendor/bin/cghooks update"
+        ],
+        "cghooks": "vendor/bin/cghooks",
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/phpcs",
+        "fix": "vendor/bin/phpcbf"
     },
     "config": {
         "allow-plugins": {
