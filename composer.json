@@ -34,11 +34,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "vendor/bin/cghooks add --ignore-lock",
-            "vendor/bin/cghooks update"
+            "@php -r \"if (file_exists('vendor/bin/cghooks')) { echo shell_exec('vendor/bin/cghooks add --ignore-lock'); echo shell_exec('vendor/bin/cghooks update'); }\""
         ],
         "post-update-cmd": [
-            "vendor/bin/cghooks update"
+            "@php -r \"if (file_exists('vendor/bin/cghooks')) { echo shell_exec('vendor/bin/cghooks update'); }\""
         ],
         "cghooks": "vendor/bin/cghooks",
         "test": "vendor/bin/phpunit",
