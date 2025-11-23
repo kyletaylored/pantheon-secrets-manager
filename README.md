@@ -55,6 +55,15 @@ If you need to bypass these checks (not recommended), you can use the `--no-veri
 git commit -m "Your message" --no-verify
 ```
 
+### EditorConfig
+
+This project includes an `.editorconfig` file to ensure consistent formatting across different editors:
+- **PHP files:** Use tabs for indentation (WordPress standard)
+- **JSON/YAML files:** Use 2 spaces
+- **Markdown files:** Use 2 spaces
+
+Most modern editors (VSCode, PHPStorm, Sublime Text, etc.) support EditorConfig automatically. If your editor doesn't, install the EditorConfig plugin.
+
 ### Manual Commands
 
 You can also run checks manually:
