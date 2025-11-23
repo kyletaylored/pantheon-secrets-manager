@@ -15,6 +15,7 @@ use PantheonSecretsManager\API\PantheonSecretsAPI;
 class SecretResolver {
 
 
+
 	/**
 	 * Secrets repository.
 	 *
@@ -25,16 +26,33 @@ class SecretResolver {
 	/**
 	 * Pantheon Secrets API.
 	 *
-	 * @var PantheonSecretsAPI
+	 * @var PantheonSecretsAPI|null
 	 */
-	private PantheonSecretsAPI $api;
+	private ?PantheonSecretsAPI $api = null;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->repository = new SecretsRepository();
-		$this->api = new PantheonSecretsAPI();
+	}
+
+	/**
+	 * Get or create the API instance.
+	 *
+	 * @return PantheonSecretsAPI|null
+	 */
+	private function get_api(): ?PantheonSecretsAPI {
+		if ( null === $this->api ) {
+			try {
+				$this->api = new PantheonSecretsAPI();
+			} catch ( \Exception $e ) {
+				// SDK not available or not configured.
+				error_log( 'Pantheon Secrets Manager: Failed to initialize API - ' . $e->getMessage() );
+				return null;
+			}
+		}
+		return $this->api;
 	}
 
 	/**
@@ -72,7 +90,12 @@ class SecretResolver {
 			return;
 		}
 
-		$value = $this->api->get_secret( $secret->get_pantheon_secret_name() );
+		$api = $this->get_api();
+		if ( ! $api ) {
+			return;
+		}
+
+		$value = $api->get_secret( $secret->get_pantheon_secret_name() );
 
 		if ( $value ) {
 			define( $constant_name, $value );
