@@ -16,6 +16,10 @@
 		<exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
 	</rule>
 
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array" value="pantheon-secrets-manager"/>

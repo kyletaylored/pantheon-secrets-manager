@@ -13,6 +13,9 @@ namespace PantheonSecretsManager\Admin;
 class AdminMenu {
 
 
+
+
+
 	/**
 	 * Initialize the admin menu.
 	 */
@@ -63,7 +66,7 @@ class AdminMenu {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'pantheon-secrets-manager' ) );
 		}
 
-		$action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : 'list';
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : 'list';
 
 		if ( 'add' === $action || 'edit' === $action ) {
 			$this->render_secret_form( $action );
@@ -81,12 +84,15 @@ class AdminMenu {
 			check_admin_referer( 'sync_secrets', 'sync_nonce' );
 			$service = new \PantheonSecretsManager\Service\SecretsSyncService();
 			$stats = $service->sync();
-			echo '<div class="notice notice-success"><p>' . sprintf(
+			echo '<div class="notice notice-success"><p>';
+			printf(
+				/* translators: 1: Created count, 2: Updated count, 3: Deleted count. */
 				esc_html__( 'Sync completed. Created: %1$d, Updated: %2$d, Deleted: %3$d', 'pantheon-secrets-manager' ),
-				$stats['created'],
-				$stats['updated'],
-				$stats['deleted']
-			) . '</p></div>';
+				(int) $stats['created'],
+				(int) $stats['updated'],
+				(int) $stats['deleted']
+			);
+			echo '</p></div>';
 		}
 
 		$repository = new \PantheonSecretsManager\Service\SecretsRepository();
@@ -122,15 +128,15 @@ class AdminMenu {
 			$secret = $repository->get( $id );
 		}
 
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['submit_secret'] ) ) {
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['submit_secret'] ) ) {
 			check_admin_referer( 'save_secret', 'secret_nonce' );
 
-			$label = sanitize_text_field( $_POST['label'] );
-			$pantheon_secret_name = sanitize_text_field( $_POST['pantheon_secret_name'] );
-			$secret_value = sanitize_text_field( $_POST['secret_value'] );
-			$php_constant_name = sanitize_text_field( $_POST['php_constant_name'] );
+			$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
+			$pantheon_secret_name = isset( $_POST['pantheon_secret_name'] ) ? sanitize_text_field( wp_unslash( $_POST['pantheon_secret_name'] ) ) : '';
+			$secret_value = isset( $_POST['secret_value'] ) ? sanitize_text_field( wp_unslash( $_POST['secret_value'] ) ) : '';
+			$php_constant_name = isset( $_POST['php_constant_name'] ) ? sanitize_text_field( wp_unslash( $_POST['php_constant_name'] ) ) : '';
 			$is_constant_enabled = isset( $_POST['is_constant_enabled'] );
-			$load_context = sanitize_text_field( $_POST['load_context'] );
+			$load_context = isset( $_POST['load_context'] ) ? sanitize_text_field( wp_unslash( $_POST['load_context'] ) ) : 'manual';
 
 			// Default constant name to secret name if empty.
 			if ( empty( $php_constant_name ) ) {
@@ -170,10 +176,6 @@ class AdminMenu {
 					$new_secret = new \PantheonSecretsManager\Model\Secret( $data );
 					if ( $repository->save( $new_secret ) ) {
 						echo '<div class="notice notice-success"><p>' . esc_html__( 'Secret saved.', 'pantheon-secrets-manager' ) . '</p></div>';
-						if ( 'add' === $action ) {
-							// Redirect to edit page or list page.
-							// For now just clear POST to avoid resubmission? Or maybe redirect.
-						}
 					} else {
 						echo '<div class="notice notice-error"><p>' . esc_html__( 'Failed to save secret metadata.', 'pantheon-secrets-manager' ) . '</p></div>';
 					}
@@ -239,7 +241,7 @@ class AdminMenu {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'pantheon-secrets-manager' ) );
 		}
 
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 			if ( isset( $_POST['submit_settings'] ) ) {
 				check_admin_referer( 'save_settings', 'settings_nonce' );
 
@@ -248,7 +250,7 @@ class AdminMenu {
 
 				// Save Roles.
 				if ( isset( $_POST['allowed_roles'] ) && is_array( $_POST['allowed_roles'] ) ) {
-					$allowed_roles = array_map( 'sanitize_text_field', $_POST['allowed_roles'] );
+					$allowed_roles = array_map( 'sanitize_text_field', wp_unslash( $_POST['allowed_roles'] ) );
 					$this->update_role_capabilities( $allowed_roles );
 				} else {
 					// If no roles checked (empty array), remove cap from all except admin maybe?

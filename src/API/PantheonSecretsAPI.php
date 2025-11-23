@@ -15,6 +15,7 @@ use Pantheon\Secrets\CustomerSecrets;
 class PantheonSecretsAPI {
 
 
+
 	/**
 	 * The CustomerSecrets client.
 	 *
@@ -52,8 +53,6 @@ class PantheonSecretsAPI {
 	 */
 	public function get_secret( string $name ) {
 		try {
-			return $this->client->getSecret( $name );
-		} catch ( \Exception $e ) {
 			$secret = $this->client->getSecret( $name );
 			return $secret ? $secret->getValue() : null;
 		} catch ( \Exception $e ) {

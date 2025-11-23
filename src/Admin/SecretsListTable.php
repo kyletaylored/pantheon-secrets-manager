@@ -19,6 +19,7 @@ use PantheonSecretsManager\Service\SecretsRepository;
 class SecretsListTable extends \WP_List_Table {
 
 
+
 	/**
 	 * Secrets repository.
 	 *
@@ -69,15 +70,24 @@ class SecretsListTable extends \WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		// TODO: Fetch items from repository and assign to $this->items.
-		// For now, just an empty array.
-		$this->items = array();
+		// Fetch items from repository.
+		$secrets = $this->repository->get_all_by_env( 'dev' ); // TODO: Get actual environment.
+
+		// Convert to array for WP_List_Table.
+		$data = array_map(
+			function ( $secret ) {
+				return $secret->to_array();
+			},
+			$secrets
+		);
+
+		$this->items = $data;
 	}
 
 	/**
 	 * Column default.
 	 *
-	 * @param object $item        The item.
+	 * @param array  $item        The item.
 	 * @param string $column_name The column name.
 	 * @return string
 	 */
@@ -89,7 +99,7 @@ class SecretsListTable extends \WP_List_Table {
 			case 'status':
 			case 'environment':
 			case 'load_context':
-				return esc_html( $item->$column_name );
+				return esc_html( $item[ $column_name ] );
 			default:
 				return print_r( $item, true );
 		}
@@ -98,13 +108,13 @@ class SecretsListTable extends \WP_List_Table {
 	/**
 	 * Column cb.
 	 *
-	 * @param object $item The item.
+	 * @param array $item The item.
 	 * @return string
 	 */
 	protected function column_cb( $item ): string {
 		return sprintf(
 			'<input type="checkbox" name="secret[]" value="%s" />',
-			$item->id
+			$item['id']
 		);
 	}
 }

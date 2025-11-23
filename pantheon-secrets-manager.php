@@ -12,6 +12,8 @@
  * Requires PHP: 8.2
  * Text Domain: pantheon-secrets-manager
  * Domain Path: /languages
+ *
+ * @package PantheonSecretsManager
  */
 
 namespace PantheonSecretsManager;

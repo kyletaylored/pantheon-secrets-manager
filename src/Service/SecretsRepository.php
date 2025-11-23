@@ -15,6 +15,9 @@ use PantheonSecretsManager\Model\Secret;
 class SecretsRepository {
 
 
+
+
+
 	/**
 	 * The table name.
 	 *
@@ -76,16 +79,16 @@ class SecretsRepository {
 
 		// Format for wpdb->insert/update.
 		$format = array(
-			'%s', // pantheon_secret_name
-			'%s', // label
-			'%s', // php_constant_name
-			'%d', // is_constant_enabled
-			'%s', // load_context
-			'%s', // environment
-			'%d', // is_plugin_owned
-			'%d', // is_deleted_locally
-			'%s', // status
-			'%s', // last_synced_at
+			'%s', // pantheon_secret_name.
+			'%s', // label.
+			'%s', // php_constant_name.
+			'%d', // is_constant_enabled.
+			'%s', // load_context.
+			'%s', // environment.
+			'%d', // is_plugin_owned.
+			'%d', // is_deleted_locally.
+			'%s', // status.
+			'%s', // last_synced_at.
 		);
 
 		if ( $secret->get_id() ) {
@@ -96,7 +99,7 @@ class SecretsRepository {
 				$format,
 				array( '%d' )
 			);
-			return $updated !== false ? $secret->get_id() : false;
+			return false !== $updated ? $secret->get_id() : false;
 		} else {
 			$inserted = $wpdb->insert(
 				$this->table_name,
@@ -117,6 +120,7 @@ class SecretsRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare( "SELECT * FROM $this->table_name WHERE id = %d", $id ),
 			ARRAY_A
 		);
@@ -139,6 +143,7 @@ class SecretsRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name WHERE pantheon_secret_name = %s AND environment = %s",
 				$name,
@@ -164,6 +169,7 @@ class SecretsRepository {
 		global $wpdb;
 
 		$rows = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->prepare( "SELECT * FROM $this->table_name WHERE environment = %s", $environment ),
 			ARRAY_A
 		);
