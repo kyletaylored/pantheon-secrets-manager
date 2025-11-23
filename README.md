@@ -37,12 +37,23 @@ Navigate to the "Pantheon Secrets" menu in the WordPress admin dashboard to mana
 
 ## Development
 
-### Setup
+### Installation
 
-1.  Clone the repository.
-2.  Run `composer install`.
+### For End Users (Production Sites)
 
-### Development
+1. Download the latest release from the [Releases page](https://github.com/kyletaylored/pantheon-secrets-manager/releases)
+2. Upload the ZIP file via WordPress admin: Plugins → Add New → Upload Plugin
+3. Activate the plugin
+
+**Note:** Release packages include all dependencies - no need to run `composer install`.
+
+### For Developers
+
+1. Clone the repository
+2. Run `composer install`
+3. Symlink or copy to your WordPress plugins directory
+
+## Configuration
 
 ### Pre-commit Hooks
 

@@ -1,4 +1,4 @@
-name: Build & Release
+name: Release
 
 on:
   push:
@@ -6,26 +6,54 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v6
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        tools: composer:v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-dev
+      - name: Install production dependencies
+        run: composer install --no-dev --optimize-autoloader --prefer-dist
 
-    - name: Build Zip
-      run: |
-        zip -r pantheon-secrets-manager.zip . -x "*.git*" "tests/*" ".github/*" "phpunit.xml" "phpcs.xml" "composer.lock"
+      - name: Create distribution directory
+        run: |
+          mkdir -p dist/pantheon-secrets-manager
+          rsync -av --exclude='dist' \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='phpunit.xml' \
+            --exclude='phpcs.xml' \
+            --exclude='.editorconfig' \
+            --exclude='.gitignore' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='README.md' \
+            ./ dist/pantheon-secrets-manager/
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: pantheon-secrets-manager.zip
+      - name: Create ZIP file
+        run: |
+          cd dist
+          zip -r pantheon-secrets-manager.zip pantheon-secrets-manager/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/pantheon-secrets-manager.zip
+          body: |
+            ## Installation
+            
+            1. Download `pantheon-secrets-manager.zip`
+            2. Upload to WordPress via Plugins → Add New → Upload Plugin
+            3. Activate the plugin
+            
+            **Note:** This release includes all required dependencies. No need to run `composer install`.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
