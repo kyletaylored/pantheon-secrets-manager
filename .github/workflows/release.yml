@@ -1,0 +1,31 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: composer:v2
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-dev
+
+    - name: Build Zip
+      run: |
+        zip -r pantheon-secrets-manager.zip . -x "*.git*" "tests/*" ".github/*" "phpunit.xml" "phpcs.xml" "composer.lock"
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: pantheon-secrets-manager.zip
