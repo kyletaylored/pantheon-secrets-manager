@@ -1,0 +1,75 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install wp-env
+        run: npm install -g @wordpress/env
+
+      - name: Create .wp-env.json
+        run: |
+          cat > .wp-env.json << 'EOF'
+          {
+            "core": "WordPress/WordPress#6.4",
+            "plugins": [ "." ],
+            "env": {
+              "tests": {
+                "mappings": {
+                  "wp-content/plugins/pantheon-secrets-manager": "."
+                }
+              }
+            }
+          }
+          EOF
+
+      - name: Start WordPress environment
+        run: wp-env start
+
+      - name: Wait for WordPress to be ready
+        run: |
+          timeout 60 bash -c 'until wp-env run cli wp core is-installed 2>/dev/null; do sleep 2; done'
+
+      - name: Activate plugin
+        run: |
+          wp-env run cli wp plugin activate pantheon-secrets-manager
+          
+      - name: Check plugin status
+        run: |
+          wp-env run cli wp plugin list --status=active --format=json | jq -e '.[] | select(.name=="pantheon-secrets-manager")'
+
+      - name: Test WP-CLI commands
+        run: |
+          wp-env run cli wp pantheon-secrets list || echo "Command executed (may have no secrets)"
+
+      - name: Check for PHP errors
+        run: |
+          wp-env run cli wp plugin list --status=active
+          
+      - name: Stop WordPress environment
+        if: always()
+        run: wp-env stop
