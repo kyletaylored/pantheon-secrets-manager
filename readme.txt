@@ -8,7 +8,7 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Manage Pantheon secrets and map them to PHP constants securely.
+Manage Pantheon Secrets through a WordPress interface.
 
 == Description ==
 

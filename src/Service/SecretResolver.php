@@ -12,94 +12,90 @@ use PantheonSecretsManager\API\PantheonSecretsAPI;
 /**
  * Class SecretResolver
  */
-class SecretResolver
-{
+class SecretResolver {
 
-    /**
-     * Secrets repository.
-     *
-     * @var SecretsRepository
-     */
-    private SecretsRepository $repository;
 
-    /**
-     * Pantheon Secrets API.
-     *
-     * @var PantheonSecretsAPI
-     */
-    private PantheonSecretsAPI $api;
+	/**
+	 * Secrets repository.
+	 *
+	 * @var SecretsRepository
+	 */
+	private SecretsRepository $repository;
 
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->repository = new SecretsRepository();
-        $this->api = new PantheonSecretsAPI();
-    }
+	/**
+	 * Pantheon Secrets API.
+	 *
+	 * @var PantheonSecretsAPI
+	 */
+	private PantheonSecretsAPI $api;
 
-    /**
-     * Define constants for a specific context.
-     *
-     * @param string $context The load context (plugin, mu_plugin).
-     */
-    public function define_constants(string $context): void
-    {
-        // Check if "Secrets Creator Only" mode is enabled.
-        if (get_option('pantheon_secrets_creator_only', false)) {
-            return;
-        }
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->repository = new SecretsRepository();
+		$this->api = new PantheonSecretsAPI();
+	}
 
-        // TODO: Get environment properly.
-        $environment = 'dev';
+	/**
+	 * Define constants for a specific context.
+	 *
+	 * @param string $context The load context (plugin, mu_plugin).
+	 */
+	public function define_constants( string $context ): void {
+		// Check if "Secrets Creator Only" mode is enabled.
+		if ( get_option( 'pantheon_secrets_creator_only', false ) ) {
+			return;
+		}
 
-        $secrets = $this->repository->get_all_by_env($environment);
+		// TODO: Get environment properly.
+		$environment = 'dev';
 
-        foreach ($secrets as $secret) {
-            if ($secret->get_load_context() === $context && $secret->is_constant_enabled()) {
-                $this->define_secret_constant($secret);
-            }
-        }
-    }
+		$secrets = $this->repository->get_all_by_env( $environment );
 
-    /**
-     * Define a constant for a secret.
-     *
-     * @param \PantheonSecretsManager\Model\Secret $secret The secret.
-     */
-    private function define_secret_constant($secret): void
-    {
-        $constant_name = $secret->get_php_constant_name();
+		foreach ( $secrets as $secret ) {
+			if ( $secret->get_load_context() === $context && $secret->is_constant_enabled() ) {
+				$this->define_secret_constant( $secret );
+			}
+		}
+	}
 
-        if (!$constant_name || defined($constant_name)) {
-            return;
-        }
+	/**
+	 * Define a constant for a secret.
+	 *
+	 * @param \PantheonSecretsManager\Model\Secret $secret The secret.
+	 */
+	private function define_secret_constant( $secret ): void {
+		$constant_name = $secret->get_php_constant_name();
 
-        $value = $this->api->get_secret($secret->get_pantheon_secret_name());
+		if ( ! $constant_name || defined( $constant_name ) ) {
+			return;
+		}
 
-        if ($value) {
-            define($constant_name, $value);
-        }
-    }
+		$value = $this->api->get_secret( $secret->get_pantheon_secret_name() );
 
-    /**
-     * Generate the MU-plugin loader.
-     *
-     * @return bool True on success, false on failure.
-     */
-    public function generate_mu_plugin_loader(): bool
-    {
-        $mu_plugins_dir = WP_CONTENT_DIR . '/mu-plugins';
-        if (!file_exists($mu_plugins_dir)) {
-            if (!mkdir($mu_plugins_dir, 0755, true)) {
-                return false;
-            }
-        }
+		if ( $value ) {
+			define( $constant_name, $value );
+		}
+	}
 
-        $loader_path = $mu_plugins_dir . '/pantheon-secrets-loader.php';
-        $plugin_path = PANTHEON_SECRETS_MANAGER_PATH . 'pantheon-secrets-manager.php';
+	/**
+	 * Generate the MU-plugin loader.
+	 *
+	 * @return bool True on success, false on failure.
+	 */
+	public function generate_mu_plugin_loader(): bool {
+		$mu_plugins_dir = WP_CONTENT_DIR . '/mu-plugins';
+		if ( ! file_exists( $mu_plugins_dir ) ) {
+			if ( ! mkdir( $mu_plugins_dir, 0755, true ) ) {
+				return false;
+			}
+		}
 
-        $content = "<?php
+		$loader_path = $mu_plugins_dir . '/pantheon-secrets-loader.php';
+		$plugin_path = PANTHEON_SECRETS_MANAGER_PATH . 'pantheon-secrets-manager.php';
+
+		$content = "<?php
 /**
  * Pantheon Secrets Manager Loader.
  *
@@ -114,6 +110,6 @@ if ( file_exists( '$plugin_path' ) ) {
 }
 ";
 
-        return (bool) file_put_contents($loader_path, $content);
-    }
+		return (bool) file_put_contents( $loader_path, $content );
+	}
 }

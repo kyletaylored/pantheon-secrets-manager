@@ -16,48 +16,46 @@
 
 namespace PantheonSecretsManager;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-define('PANTHEON_SECRETS_MANAGER_VERSION', '1.0.0');
-define('PANTHEON_SECRETS_MANAGER_PATH', plugin_dir_path(__FILE__));
-define('PANTHEON_SECRETS_MANAGER_URL', plugin_dir_url(__FILE__));
+define( 'PANTHEON_SECRETS_MANAGER_VERSION', '1.0.0' );
+define( 'PANTHEON_SECRETS_MANAGER_PATH', plugin_dir_path( __FILE__ ) );
+define( 'PANTHEON_SECRETS_MANAGER_URL', plugin_dir_url( __FILE__ ) );
 
-if (file_exists(PANTHEON_SECRETS_MANAGER_PATH . 'vendor/autoload.php')) {
-    require_once PANTHEON_SECRETS_MANAGER_PATH . 'vendor/autoload.php';
+if ( file_exists( PANTHEON_SECRETS_MANAGER_PATH . 'vendor/autoload.php' ) ) {
+	require_once PANTHEON_SECRETS_MANAGER_PATH . 'vendor/autoload.php';
 }
 
 /**
  * Bootstrap the plugin.
  */
-function bootstrap()
-{
-    // Initialize services here.
-    $resolver = new \PantheonSecretsManager\Service\SecretResolver();
-    $resolver->define_constants('plugin');
+function bootstrap() {
+	// Initialize services here.
+	$resolver = new \PantheonSecretsManager\Service\SecretResolver();
+	$resolver->define_constants( 'plugin' );
 
-    if (is_admin()) {
-        $admin_menu = new \PantheonSecretsManager\Admin\AdminMenu();
-        $admin_menu->init();
-    }
+	if ( is_admin() ) {
+		$admin_menu = new \PantheonSecretsManager\Admin\AdminMenu();
+		$admin_menu->init();
+	}
 
-    if (defined('WP_CLI') && WP_CLI) {
-        WP_CLI::add_command('pantheon-secrets', '\PantheonSecretsManager\CLI\SecretsCommand');
-    }
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		WP_CLI::add_command( 'pantheon-secrets', '\PantheonSecretsManager\CLI\SecretsCommand' );
+	}
 }
 
-add_action('plugins_loaded', __NAMESPACE__ . '\\bootstrap');
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );
 
 /**
  * Activation hook.
  */
-function activate()
-{
-    $role = get_role('administrator');
-    if ($role) {
-        $role->add_cap('manage_pantheon_secrets');
-    }
+function activate() {
+	$role = get_role( 'administrator' );
+	if ( $role ) {
+		$role->add_cap( 'manage_pantheon_secrets' );
+	}
 }
 
-register_activation_hook(__FILE__, __NAMESPACE__ . '\\activate');
+register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
